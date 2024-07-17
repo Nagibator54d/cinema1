@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Base styles */
+        body, html {
+            height: 100%;
+            margin: 0;
+            padding: 0;
+            overflow-x: hidden; /* Disable horizontal overflow */
+        }
+        /* Styles for the animated background */
+        .area {
+            background: #00bfff; /* Aqua background */
+            height: 100%;
+            width: 100%;
+            position: fixed;
+            z-index: -1;
+            top: 0;
+            left: 0;
+        }
+        .circles {
+            list-style: none;
+            margin: 0;
+            padding: 0;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+        .circles li {
+            position: absolute;
+            display: block;
+            width: 20px;
+            height: 20px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 50%;
+            animation: animate 25s linear infinite;
+            bottom: -150px;
+        }
+        .circles li:nth-child(1) {
+            left: 25%;
+            width: 80px;
+            height: 80px;
+            animation-duration: 22s;
+        }
+        .circles li:nth-child(2) {
+            left: 10%;
+            width: 20px;
+            height: 20px;
+            animation-duration: 12s;
+            animation-delay: 3s;
+        }
+        .circles li:nth-child(3) {
+            left: 70%;
+            width: 20px;
+            height: 20px;
+            animation-duration: 18s;
+        }
+        .circles li:nth-child(4) {
+            left: 40%;
+            width: 60px;
+            height: 60px;
+            animation-duration: 30s;
+            animation-delay: 4s;
+        }
+        .circles li:nth-child(5) {
+            left: 65%;
+            width: 40px;
+            height: 40px;
+            animation-duration: 16s;
+        }
+        .circles li:nth-child(6) {
+            left: 75%;
+            width: 110px;
+            height: 110px;
+            animation-duration: 25s;
+        }
+        .circles li:nth-child(7) {
+            left: 35%;
+            width: 150px;
+            height: 150px;
+            animation-duration: 30s;
+            animation-delay: 7s;
+        }
+        .circles li:nth-child(8) {
+            left: 50%;
+            width: 25px;
+            height: 25px;
+            animation-duration: 45s;
+            animation-delay: 15s;
+        }
+        .circles li:nth-child(9) {
+            left: 20%;
+            width: 15px;
+            height: 15px;
+            animation-duration: 35s;
+            animation-delay: 2s;
+        }
+        .circles li:nth-child(10) {
+            left: 85%;
+            width: 150px;
+            height: 150px;
+            animation-duration: 11s;
+        }
+
+        /* Keyframes for the animation */
+        @keyframes animate {
+            0% {
+                transform: translateY(0) rotate(0deg);
+                opacity: 1;
+                border-radius: 0;
+            }
+            100% {
+                transform: translateY(-1000px) rotate(720deg);
+                opacity: 0;
+                border-radius: 50%;
+            }
+        }
+
+        /* Styles for the form and content */
+        .content-wrapper {
+            position: relative;
+            z-index: 1; /* Ensure content is above the background */
+        }
+        .form-container {
+            background-color: azure;
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            margin: 20px auto;
+            max-width: 400px;
+        }
+        .form-container form {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+        }
+        .form-container h2 {
+            text-align: center;
+            font-size: 2rem;
+            font-weight: bold;
+            margin-bottom: 20px;
+        }
+        .form-container p {
+            text-align: center;
+            font-size: 1rem;
+            color: #888;
+            margin-bottom: 20px;
+        }
+        .form-container a {
+            color: #3490dc;
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+        .form-container a:hover {
+            color: #2779bd;
+        }
+        .form-container .custom-input {
+            background-color: rgb(240, 248, 255); /* Light cyan background */
+            border: 1px solid #ccc; /* Light grey border */
+            padding: 0.5rem; /* Padding */
+            border-radius: 0.375rem; /* Rounded corners */
+            width: 100%; /* Full width */
+            margin-bottom: 10px;
+        }
+        .form-container .custom-input:focus {
+            outline: none;
+            border-color: #3490dc;
+            box-shadow: 0 0 0 2px rgba(52, 144, 220, 0.2);
+        }
+        .form-container .error-message {
+            color: #e53e3e;
+            font-size: 0.875rem;
+            margin-top: 0.25rem;
+        }
+        .form-container button {
+            background-color: #3490dc;
+            color: #fff;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+        .form-container button:hover {
+            background-color: #2779bd;
+        }
+    </style>
+</head>
+<body>
+    <div class="area">
+        <ul class="circles">
+            <li></li>
+            <li></li>
+            <li></li>
+            <li></li>
+            <li></li>
+            <li></li>
+            <li></li>
+            <li></li>
+            <li></li>
+            <li></li>
+        </ul>
+    </div>
+
+    <div class="content-wrapper">
+        <div class="min-h-screen bg-aqua flex flex-col justify-center py-12 sm:px-6 lg:px-8">
+            <div class="sm:mx-auto sm:w-full sm:max-w-md">
+                <img class="mx-auto h-10 w-auto" src="https://www.svgrepo.com/show/301692/login.svg" alt="Workflow">
+                <h2 class="mt-6 text-center text-3xl leading-9 font-extrabold text-gray-900">
+                    Create a new account
+                </h2>
+                <p class="mt-2 text-center text-sm text-gray-500">
+                    Or
+                    <a href="{% url 'login' %}"
+                       class="font-medium text-blue-600 hover:text-blue-500 focus:outline-none focus:underline transition ease-in-out duration-150">
+                        login to your account
+                    </a>
+                </p>
+            </div>
+
+            <div class="mt-8 sm:mx-auto sm:w-full sm:max-w-md form-container">
+                <form method="post" action="#">
+                    <div>
+                        {% csrf_token %}
+                    </div>
+
+                    <div class="mt-6">
+                        {% for field in form %}
+                            <div class="mt-4">
+                                {{ field.label_tag }}
+                                {{ field }}
+                                {% if field.errors %}
+                                    <div class="error-message">
+                                        {{ field.errors }}
+                                    </div>
+                                {% endif %}
+                            </div>
+                        {% endfor %}
+                    </div>
+
+                    <div class="mt-6">
+                        <button type="submit" class="w-full">
+                            Create account
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

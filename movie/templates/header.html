@@ -1,0 +1,122 @@
+<!-- header.html -->
+
+<header class="bg-gray-500 sticky top-0 z-50 px-4" style="background-color: black;">
+  <div class="container mx-auto flex justify-between items-center py-4">
+    <!-- Left section: Logo -->
+    <div class="flex items-center">
+      <a href="{% url 'movie_list' %}">
+        <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTqmjza6n5F_Kc_HyKpmp4fgDk3g1D599UMdA&s" alt="Logo" class="h-14 w-auto mr-4">
+      </a>
+    </div>
+    
+    <!-- Hamburger menu (for mobile) -->
+    <div class="flex md:hidden">
+      <button id="hamburger" class="text-white focus:outline-none">
+        <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path>
+        </svg>
+      </button>
+    </div>
+
+    <!-- Center section: Menu -->
+    <nav class="hidden md:flex md:flex-grow justify-center" style="display: flex;">
+      {% for category in categories %}
+        <a href="{{ category.get_absolute_url }}" class="block px-4 py-2 text-sm hover:text-gray-100" style="font-size: 20px;">{{ category.name }}</a>
+        <hr>
+      {% endfor %}
+    </nav>
+
+    <!-- Right section: User Info / Buttons -->
+    <div class="hidden lg:flex items-center space-x-4">
+      {% if user.is_authenticated %}
+        <div class="relative inline-block text-left">
+          <button id="user-menu-button" class="flex items-center text-white focus:outline-none">
+            <img class="h-8 w-8 rounded-full" src="https://www.svgrepo.com/show/499664/user-happy.svg" alt="">
+            <span class="ml-2">{{ user.username }}</span>
+          </button>
+          <div id="user-menu" class="hidden absolute right-0 mt-2 w-48 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 focus:outline-none">
+            <div class="py-1">
+              <a href="{% url 'user_profile' %}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Account</a>
+              <a href="{% url 'favorites' %}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Favorites</a>
+              <form method="post" action="{% url 'logout' %}">
+                {% csrf_token %}
+                <button type="submit" class="block w-full text-left px-4 py-2 text-sm text-red-700 hover:bg-red-100">Logout</button>
+              </form>
+            </div>
+          </div>
+        </div>
+      {% else %}
+        <a href="{% url 'login' %}"><button class="rounded-button">Войти</button></a>
+        <a href="{% url 'signup' %}"><button class="rounded-button2">Зарегистрироваться</button></a>
+      {% endif %}
+    </div>
+  </div>
+</header>
+
+<!-- Mobile menu -->
+<nav id="mobile-menu-placeholder" class="mobile-menu hidden flex-col items-center space-y-8 md:hidden px-8">
+  {% for category in categories %}
+    <a href="{{ category.get_absolute_url }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">{{ category.name }}</a>
+    <hr>
+  {% endfor %}
+  <div class="flex flex-col mt-6 space-y-2 items-center">
+    {% if user.is_authenticated %}
+      <a href="{% url 'user_profile' %}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Account</a>
+      <a href="{% url 'favorites' %}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Favorites</a>
+      <form method="post" action="{% url 'logout' %}">
+        {% csrf_token %}
+        <button type="submit" class="block w-full text-left px-4 py-2 text-sm text-red-700 hover:bg-red-100">Logout</button>
+      </form>
+    {% else %}
+      <a href="{% url 'login' %}"><button class="rounded-button">Войти</button></a>
+      <a href="{% url 'signup' %}"><button class="rounded-button2">Зарегистрироваться</button></a>
+    {% endif %}
+  </div>
+
+  <style>
+    .rounded-button {
+      display: inline-block;
+      padding: 10px 20px;
+      font-size: 16px;
+      color: black;
+      background-color: yellow;
+      border: 2px solid yellow;
+      border-radius: 10px;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+    .rounded-button:hover {
+      color: yellow;
+      background-color: black;
+    }
+    .rounded-button2 {
+      display: inline-block;
+      padding: 10px 20px;
+      font-size: 16px;
+      color: black;
+      background-color: yellow;
+      border: 2px solid yellow;
+      border-radius: 10px;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+    .rounded-button2:hover {
+      color: yellow;
+      background-color: black;
+    }
+  </style>
+</nav>
+
+<script>
+document.getElementById('user-menu-button').onclick = function() {
+  var menu = document.getElementById('user-menu');
+  menu.classList.toggle('hidden');
+}
+
+document.getElementById('hamburger').onclick = function() {
+  var menu = document.getElementById('mobile-menu-placeholder');
+  menu.classList.toggle('hidden');
+}
+</script>

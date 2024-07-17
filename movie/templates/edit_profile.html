@@ -1,0 +1,72 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="bg-gray-100 flex h-screen items-center justify-center px-4 sm:px-6 lg:px-8">
+    <div class="w-full max-w-md space-y-8">
+        <div class="bg-white shadow-md rounded-md p-6">
+            <h2 class="my-3 text-center text-3xl font-bold tracking-tight text-gray-900">Информация о пользователе {{ user.username }}</h2>
+            <form method="POST" action="{% url 'edit_profile' %}" enctype="multipart/form-data">
+                {% csrf_token %}
+                <div class="space-y-4">
+                    <div>
+                        <label for="username">Имя:</label>
+                        <input type="text" id="username" name="username" value="{{ user.username }}" class="form-input">
+                    </div>
+                    <div>
+                        <label for="email">E-mail:</label>
+                        <input type="email" id="email" name="email" value="{{ user.email }}" class="form-input">
+                    </div>
+                    <div>
+                        <label for="password">Пароль:</label>
+                        <input type="text" id="password" name="password"  value="{{ user.password }}" class="form-input">
+                        <input type="checkbox" id="toggle-password" class="toggle-password"> Показать пароль 
+                    </div>
+                    <div>
+                        <label for="avatar">Аватар:</label>
+                        <input type="file" id="avatar" name="avatar" class="form-input">
+                    </div>
+                    <button type="submit" class="btn-primary">Сохранить</button>
+                </div>
+            </form>
+            <div class="mt-4">
+                <a href="{% url 'favorites' %}" class="btn-primary">Перейти в избранное</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.form-input {
+    width: 100%;
+    padding: 8px;
+    margin-top: 5px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+}
+.btn-primary {
+    display: inline-block;
+    padding: 10px 20px;
+    background-color: #007bff;
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+.btn-primary:hover {
+    background-color: #0056b3;
+}
+.form-input {
+            padding: 10px;
+            margin-bottom: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+
+        .toggle-password {
+            cursor: pointer;
+            margin-left: 10px;
+        }
+
+</style>
+{% endblock %}

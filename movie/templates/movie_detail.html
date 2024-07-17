@@ -1,0 +1,39 @@
+<!-- Example: movies/templates/movies/movie_detail.html -->
+{% extends "base.html" %}
+{% block content %}
+<h1>{{ movie.title }}</h1>
+<img src="{{ movie.poster.url }}" alt="{{ movie.title }}" style="width:300px;height:auto;">
+<p>{{ movie.description }}</p>
+<p>Director: {{ movie.director.name }}</p>
+<p>Release Date: {{ movie.release_date }}</p>
+<p>Duration: {{ movie.duration }} minutes</p>
+<p>Genres: 
+    {% for genre in movie.genres.all %}
+        {{ genre.name }}{% if not forloop.last %}, {% endif %}
+    {% endfor %}
+</p>
+<p>Cast:
+    {% for actor in movie.cast.all %}
+        {{ actor.name }}{% if not forloop.last %}, {% endif %}
+    {% endfor %}
+</p>
+<h2>Comments</h2>
+<ul>
+    {% for comment in comments %}
+        <li>{{ comment.author.username }}: {{ comment.text }} ({{ comment.created_date }})</li>
+    {% endfor %}
+</ul>
+<h3>Add a comment</h3>
+{% if user.is_authenticated %}
+    <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit">Add comment</button>
+    </form>
+{% else %}
+    <p>You need to <a href="{% url 'login' %}">login</a> to add a comment.</p>
+{% endif %}
+<a href="{% url 'movie_list' %}">Back to movie list</a>
+{% endblock %}
+
+
