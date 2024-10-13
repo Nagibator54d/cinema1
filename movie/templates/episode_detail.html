@@ -1,0 +1,124 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="relative w-full h-screen bg-black">
+    <!-- Видеоплеер для текущего эпизода -->
+    <div class="video-container w-full h-[70%] bg-gray-800 flex items-center justify-center">
+        <video id="episode-video" class="w-full h-full" controls>
+            <!-- Источники с разными качествами -->
+            <source src="{{ episode.video1.url }}" type="video/mp4" label="480p">
+            <source src="{{ episode.video2.url }}" type="video/mp4" label="720p">
+            <source src="{{ episode.video3.url }}" type="video/mp4" label="1080p">
+            Ваш браузер не поддерживает элемент video.
+        </video>
+    </div>
+    
+    <!-- Контролы для видео -->
+    <div class="controls absolute bottom-10 left-10 bg-gray-900 p-3 rounded-md flex items-center space-x-4">
+        <!-- Кнопка регулировки качества -->
+        <select id="quality-select" class="bg-gray-700 text-white p-2 rounded">
+            <option value="480p">480p</option>
+            <option value="720p">720p</option>
+            <option value="1080p">1080p</option>
+        </select>
+        <!-- Кнопка регулировки скорости воспроизведения -->
+        <button id="speed-btn" class="bg-gray-700 text-white p-2 rounded">1x</button>
+        <!-- Кнопка для скачивания -->
+        <a id="download-btn" href="{{ episode.video3.url }}" download class="bg-gray-700 text-white p-2 rounded">Скачать</a>
+    </div>
+
+    <!-- Кнопка для возврата к сериалу -->
+    <a href="{% url 'series_detail' series.pk %}" class="absolute top-4 left-4 bg-yellow-500 text-black py-2 px-4 rounded-full text-lg">Назад к сериалу</a>
+</div>
+
+<!-- Блок с другими сериями -->
+<div class="py-10 bg-gray-900">
+    <h2 class="text-white text-2xl font-bold text-center mb-4">Другие серии</h2>
+    <div class="flex flex-wrap justify-center gap-4">
+        {% for other_episode in series.episodes.exclude(pk=episode.pk) %}
+            <div class="w-1/4 sm:w-1/6 bg-gray-800 rounded-lg p-2">
+                <a href="{% url 'episode_detail' series.pk season.pk other_episode.pk %}" class="block">
+                    <img src="{{ other_episode.poster.url }}" alt="{{ other_episode.title }}" class="w-full h-auto rounded-md mb-2">
+                    <div class="text-center text-white">
+                        <p>Серия {{ other_episode.episode_number }}</p>
+                        <button class="play-button bg-yellow-500 text-black py-1 px-3 rounded">Воспроизвести</button>
+                    </div>
+                </a>
+            </div>
+        {% empty %}
+            <p class="text-white text-center">Нет доступных серий.</p>
+        {% endfor %}
+    </div>
+</div>
+
+<script>
+    const video = document.getElementById('episode-video');
+    const qualitySelect = document.getElementById('quality-select');
+    const speedBtn = document.getElementById('speed-btn');
+    const downloadBtn = document.getElementById('download-btn');
+    let playbackRates = [0.5, 1, 1.5, 2];
+    let currentRate = 1;
+
+    // Изменение качества
+    qualitySelect.addEventListener('change', (event) => {
+        const quality = event.target.value;
+        const sources = video.querySelectorAll('source');
+        for (let source of sources) {
+            if (source.getAttribute('label') === quality) {
+                video.src = source.src;
+                video.load();
+                video.play();
+                break;
+            }
+        }
+    });
+
+    // Изменение скорости воспроизведения
+    speedBtn.addEventListener('click', () => {
+        currentRate = (currentRate + 0.5) % playbackRates.length;
+        video.playbackRate = playbackRates[currentRate];
+        speedBtn.textContent = `${playbackRates[currentRate]}x`;
+    });
+
+    // Скачивание видео
+    downloadBtn.href = video.src;
+    video.addEventListener('loadeddata', () => {
+        downloadBtn.href = video.src;
+    });
+</script>
+
+<style>
+    .controls {
+        position: absolute;
+        bottom: 10px;
+        left: 10px;
+        display: flex;
+        gap: 10px;
+        background: rgba(0, 0, 0, 0.7);
+        padding: 10px;
+        border-radius: 5px;
+    }
+    #quality-select, #speed-btn, #download-btn {
+        background: #333;
+        color: #fff;
+        border: none;
+        padding: 5px 10px;
+        border-radius: 5px;
+        cursor: pointer;
+    }
+    #quality-select {
+        width: 80px;
+    }
+    .play-button {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        border: none;
+        background-color: #ff0000;
+        color: white;
+        font-size: 16px;
+        padding: 8px 16px;
+        border-radius: 5px;
+        cursor: pointer;
+    }
+</style>
+{% endblock %}

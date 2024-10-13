@@ -2,7 +2,7 @@ from rest_framework.generics import GenericAPIView
 from rest_framework import mixins
 from movie.models import Movie ,Comment
 from .serializers import MovieSerializer,CommentSerializer
-from rest_framework.viewsets import ViewSet
+from rest_framework.viewsets import ViewSet,ModelViewSet
 from rest_framework.response import Response
 from rest_framework.status import *
 from django.shortcuts import get_object_or_404
@@ -46,15 +46,6 @@ class MovieDetailView(GenericAPIView,
      
     def delete(self,request,*args,**kwargs):
         return self.destroy(request,*args,**kwargs)      
-
-
-
-
-
-
-
-
-
 
 
 

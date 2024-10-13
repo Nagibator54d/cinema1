@@ -7,7 +7,7 @@ router.register('movie/',MovieViewSet, basename='movie' )
 
 
 urlpatterns=[
-    path('profiles/',MovieListView.as_view(),name='movie_list'),
+    path('movies/',MovieListView.as_view(),name='movie_list'),
     path('<int:pk>/',MovieDetailView.as_view(),name='movie_detail'),
 
 ]+router.urls

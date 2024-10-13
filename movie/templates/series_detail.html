@@ -1,0 +1,304 @@
+{% extends "base.html" %}
+{% block content %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{{ series.title }}</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer" />
+  <style>
+   /* Modal background */
+.modal {
+  display: none; /* Hidden by default */
+  position: fixed;
+  z-index: 1; /* Sit on top */
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden; /* Disable scroll when modal is open */
+  background-color: rgba(0, 0, 0, 0.5); /* Black background with opacity */
+}
+
+/* Modal content */
+.modal-content {
+  background-color: #16151a;
+  margin: 15% auto; /* 15% from the top and centered */
+  padding: 20px;
+  border: 1px solid #888;
+  width: 560px; /* Width of the modal */
+  height: 389px; /* Height of the modal */
+  position: relative;
+}
+
+/* Close button */
+.close {
+  color: #aaa;
+  float: right;
+  font-size: 28px;
+  font-weight: bold;
+}
+
+.close:hover,
+.close:focus {
+  color: white;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+/* Modal title */
+.modal-title {
+  text-align: center;
+  color: white;
+  font-size: 24px;
+  margin-top: 10px;
+  margin-bottom: 20px;
+}
+  </style>
+</head>
+<body style="background-color: #16151a;">
+   
+  <div class="relative w-full h-screen bg-cover bg-center" style="background-image: url('{{ series.poster.url }}');">
+      <div class="absolute inset-0 bg-black opacity-60"></div>
+      <div class="flex flex-col items-center justify-center h-full relative z-10">
+    {% if user.is_authenticated %}
+        {% for season in seasons %}
+        <h2>{{ season.title }}</h2>
+        <div>
+            {% for episode in season.episodes.all %}
+                <div>
+                    <a href="{% url 'episode_detail' series.id season.id episode.id %}">
+                        <button class="play-button" style="color:yellow;">
+                            <svg viewBox="0 0 24 24" width="48" height="48" fill="white">
+                                <path d="M8 5v14l11-7z"></path>
+                            </svg>
+                        </button>
+                    </a>
+                </div>
+            {% endfor %}
+        </div>
+    {% endfor %}
+        {% else %}
+            <a href="{% url 'login' %}" class="bg-yellow-500 text-black py-2 px-4 rounded-full text-lg">Войти для просмотра</a>
+        {% endif %}
+        <h1 class="text-white text-3xl mt-4">{{ series.title }}</h1>
+        <button class="bg-red-500 text-white py-1 px-3 rounded-full mt-2" id="favorite-button">Добавить в избранное</button>
+    
+      <div class="absolute right-4 bottom-4 text-white">
+         <button id="report-issue-btn" style=" position: fixed; bottom: 20px; right: 20px; padding: 10px 20px; background-color: #007bff; color: white; border: none; border-radius: 5px; cursor: pointer;">
+          Проблема с контентом? Сообщите нам⚠️
+         </button>
+      </div>
+    </div>
+
+  <!-- Модальное окно -->
+  <div id="report-issue-modal" class="modal" style="position: fixed;">
+    <div class="modal-content">
+      <span class="close" style="background-color: #16151a;">&times;</span>
+      <h2 class="modal-title" style="background-color: #16151a; color: azure; font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;"><i class="alert-icon fas fa-exclamation-triangle"></i> Сообщить о проблеме</h2>
+      <form id="report-issue-form" method="post" action="{% url 'report_issue' %}"  style="background-color: #16151a;">
+        {% csrf_token %}
+        <label for="issue-description" style="color: azure; font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif; font-size: large;"> Опишите проблему:</label><br>
+        <textarea id="issue-description"   name="issue-description" rows="4" cols="50" style="background-color: white; border-color: red;  border-radius: 10px; border-width: 10px;" placeholder="Пожалуйста подробно Опишите проблему"></textarea><br><br>
+        <button type="submit" style="background-color: #28a745; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer;">Отправить</button>
+        <button type="button" id="cancel-report" style="background-color: #dc3545; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer;">Отменить</button>
+      </form>
+    </div>
+  </div>
+  <div class="container mx-auto mt-6" style="background-color: #16151a; color: azure;">
+    <div class="flex">
+        <img src="{{ series.poster.url }}" alt="{{ series.title }}" class="w-52 h-auto" style="border-radius: 10px;">
+        <div class="ml-6">
+            <h2 class="text-2xl font-bold">{{ series.title }}</h2>
+            <p>Год выпуска: {{ series.release_date.year }}</p>
+            <p>Страна: {{ series.country }}</p>
+            <p>Жанр: 
+                {% for genre in series.genres.all %}
+                    {{ genre.name }}{% if not forloop.last %}, {% endif %}
+                {% endfor %}
+            </p>
+            <p>Описание: {{ series.description }}</p>
+            <p>Актеры: 
+                {% for actor in series.cast.all %}
+                    {{ actor.name }}{% if not forloop.last %}, {% endif %}
+                {% endfor %}
+            </p>
+            <p>Режиссер: {{ series.director.name }}</p>
+            <p>Сценарист: {{ series.screenwriter.name }}</p>
+            <p>Продюссер: {{ series.producer.name }}</p>
+        </div>
+    </div>
+
+    <!-- Tabs -->
+    <div class="mt-8">
+        <button id="description-tab" class="bg-blue-500 text-white py-2 px-4 rounded-tl rounded-tr">Описание</button>
+        <button id="seasons-tab" class="bg-gray-200 text-black py-2 px-4 rounded-tl rounded-tr">Сезоны и Серии</button>
+        <button id="comments-tab" class="bg-gray-200 text-black py-2 px-4 rounded-tl rounded-tr">Отзывы</button>
+    </div>
+
+    <!-- Description content -->
+    <div id="description-content" class="p-4 border border-t-0">
+        <h3 class="text-xl font-bold mb-2">Описание сериала</h3>
+        <p>{{ series.description }}</p>
+        <p>Жанр: 
+            {% for genre in series.genres.all %}
+                {{ genre.name }}{% if not forloop.last %}, {% endif %}
+            {% endfor %}
+        </p>
+        <p>Актеры: 
+            {% for actor in series.cast.all %}
+                {{ actor.name }}{% if not forloop.last %}, {% endif %}
+            {% endfor %}
+        </p>
+        <p>Режиссер: {{ series.director.name }}</p>
+    </div>
+
+    <!-- Seasons and Episodes content -->
+    <div id="seasons-content" class="hidden p-4 border border-t-0">
+        <h3 class="text-xl font-bold mb-2">Сезоны и Серии</h3>
+        <div>
+            {% for season in series.seasons.all %}
+                <h4 class="text-lg font-semibold mt-4">{{ season.title }}</h4>
+                <ul>
+                    {% for episode in season.episodes.all %}
+                        <li class="mt-2">
+                            <a href="{% url 'episode_detail' series.id season.id episode.id %}">
+                                {{ episode.title }} - {{ episode.description }}
+                            </a>
+                        </li>
+                    {% endfor %}
+                </ul>
+            {% endfor %}
+        </div>
+    </div>
+
+    <!-- Comments content -->
+    <div id="comments-content" class="hidden p-4 border border-t-0">
+        <h3 class="text-xl font-bold mb-2">Отзывы</h3>
+        {% if user.is_authenticated %}
+            <form method="post" class="mb-4">
+                {% csrf_token %}
+                <div class="flex items-start">
+                    <img src="https://www.svgrepo.com/show/499664/user-happy.svg" alt="{{ user.username }}" class="w-10 h-10 rounded-full mr-4">
+                    <textarea name="text" class="w-full p-2 border rounded-lg" rows="3" style="background-color: #16151a; color: azure;" placeholder="Оставьте свой отзыв"></textarea>
+                </div>
+                <div class="flex justify-end mt-2">
+                    <button type="submit" class="bg-blue-500 text-white py-2 px-4 rounded">Отправить</button>
+                </div>
+            </form>
+        {% else %}
+            <p class="text-red-500">Войдите, чтобы оставить отзыв.</p>
+        {% endif %}
+
+        {% for comment in series.comments.all %}
+            <div class="mb-4">
+                <div class="flex items-center">
+                    <img src="https://www.svgrepo.com/show/499664/user-happy.svg" alt="{{ comment.user.username }}" class="w-10 h-10 rounded-full mr-4">
+                    <div>
+                        <p class="font-semibold">{{ comment.user.username }}</p>
+                        <p>{{ comment.text }}</p>
+                        <p class="text-gray-500 text-sm">{{ comment.created_at|date:"d M Y H:i" }}</p>
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+</div>
+
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+    const favoriteButton = document.getElementById('favorite-button');
+    favoriteButton.addEventListener('click', function () {
+        // Simple example of adding the series to favorites
+        fetch('/add_to_favorites/{{ series.id }}', { method: 'POST' })
+            .then(response => {
+                if (response.ok) {
+                    favoriteButton.textContent = 'В избранном';
+                    favoriteButton.disabled = true;
+                } else {
+                    alert('Ошибка при добавлении в избранное');
+                }
+            })
+            .catch(error => {
+                alert('Ошибка при добавлении в избранное');
+            });
+    });
+
+    const reportIssueBtn = document.getElementById('report-issue-btn');
+    const reportIssueModal = document.getElementById('report-issue-modal');
+    const closeModal = document.getElementsByClassName('close')[0];
+    const cancelReport = document.getElementById('cancel-report');
+    const reportIssueForm = document.getElementById('report-issue-form');
+
+    reportIssueBtn.onclick = function() {
+        reportIssueModal.style.display = 'block';
+        document.body.style.overflow = 'hidden'; // Disable scroll
+    };
+
+    closeModal.onclick = function() {
+        reportIssueModal.style.display = 'none';
+        document.body.style.overflow = 'auto'; // Enable scroll
+    };
+
+    cancelReport.onclick = function() {
+        reportIssueModal.style.display = 'none';
+        document.body.style.overflow = 'auto'; // Enable scroll
+    };
+
+    window.onclick = function(event) {
+        if (event.target == reportIssueModal) {
+            reportIssueModal.style.display = 'none';
+            document.body.style.overflow = 'auto'; // Enable scroll
+        }
+    };
+
+        const descriptionTab = document.getElementById('description-tab');
+        const seasonsTab = document.getElementById('seasons-tab');
+        const commentsTab = document.getElementById('comments-tab');
+        const descriptionContent = document.getElementById('description-content');
+        const seasonsContent = document.getElementById('seasons-content');
+        const commentsContent = document.getElementById('comments-content');
+
+        descriptionTab.addEventListener('click', function () {
+            descriptionContent.classList.remove('hidden');
+            seasonsContent.classList.add('hidden');
+            commentsContent.classList.add('hidden');
+            descriptionTab.classList.add('bg-blue-500', 'text-white');
+            descriptionTab.classList.remove('bg-gray-200', 'text-black');
+            seasonsTab.classList.remove('bg-blue-500', 'text-white');
+            seasonsTab.classList.add('bg-gray-200', 'text-black');
+            commentsTab.classList.remove('bg-blue-500', 'text-white');
+            commentsTab.classList.add('bg-gray-200', 'text-black');
+        });
+
+        seasonsTab.addEventListener('click', function () {
+            descriptionContent.classList.add('hidden');
+            seasonsContent.classList.remove('hidden');
+            commentsContent.classList.add('hidden');
+            seasonsTab.classList.add('bg-blue-500', 'text-white');
+            seasonsTab.classList.remove('bg-gray-200', 'text-black');
+            descriptionTab.classList.remove('bg-blue-500', 'text-white');
+            descriptionTab.classList.add('bg-gray-200', 'text-black');
+            commentsTab.classList.remove('bg-blue-500', 'text-white');
+            commentsTab.classList.add('bg-gray-200', 'text-black');
+        });
+
+        commentsTab.addEventListener('click', function () {
+            descriptionContent.classList.add('hidden');
+            seasonsContent.classList.add('hidden');
+            commentsContent.classList.remove('hidden');
+            commentsTab.classList.add('bg-blue-500', 'text-white');
+            commentsTab.classList.remove('bg-gray-200', 'text-black');
+            descriptionTab.classList.remove('bg-blue-500', 'text-white');
+            descriptionTab.classList.add('bg-gray-200', 'text-black');
+            seasonsTab.classList.remove('bg-blue-500', 'text-white');
+            seasonsTab.classList.add('bg-gray-200', 'text-black');
+        });
+    });
+</script>
+
+</body>
+</html>
+{% endblock %}

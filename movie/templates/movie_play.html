@@ -1,0 +1,85 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="relative w-full h-screen bg-black">
+    <video id="movie-video" class="w-full h-full" controls>
+        <!-- Источники с разными качествами -->
+        <source src="{{ movie.video1url }}" type="video/mp4" label="480p">
+        <source src="{{ movie.video2.url }}" type="video/mp4" label="720p">
+        <source src="{{ movie.video3.url }}" type="video/mp4" label="1080p">
+        Your browser does not support the video tag.
+    </video>
+    <a href="{% url 'movie_detail' movie.id %}" class="absolute top-4 left-4 bg-yellow-500 text-black py-2 px-4 rounded-full text-lg">Назад к фильму</a>
+    <div class="controls">
+        <!-- Кнопка регулировки качества -->
+        <select id="quality-select">
+            <option value="480p">480p</option>
+            <option value="720p">720p</option>
+            <option value="1080p">1080p</option>
+        </select>
+        <!-- Кнопка регулировки скорости воспроизведения -->
+        <button id="speed-btn">1x</button>
+        <!-- Кнопка для скачивания -->
+        <a id="download-btn" href="{{ movie.video3.url }}"  download>Скачать</a>
+    </div>
+</div>
+
+<script>
+    const video = document.getElementById('movie-video');
+    const qualitySelect = document.getElementById('quality-select');
+    const speedBtn = document.getElementById('speed-btn');
+    const downloadBtn = document.getElementById('download-btn');
+    let playbackRates = [0.5, 1, 1.5, 2];
+    let currentRate = 1;
+
+    // Изменение качества
+    qualitySelect.addEventListener('change', (event) => {
+        const quality = event.target.value;
+        const sources = video.querySelectorAll('source');
+        for (let source of sources) {
+            if (source.getAttribute('label') === quality) {
+                video.src = source.src;
+                video.load();
+                video.play();
+                break;
+            }
+        }
+    });
+
+    // Изменение скорости воспроизведения
+    speedBtn.addEventListener('click', () => {
+        currentRate = (currentRate + 0.5) % playbackRates.length;
+        video.playbackRate = playbackRates[currentRate];
+        speedBtn.textContent = `${playbackRates[currentRate]}x`;
+    });
+
+    // Скачивание видео
+    downloadBtn.href = video.src;
+    video.addEventListener('loadeddata', () => {
+        downloadBtn.href = video.src;
+    });
+</script>
+
+<style>
+    .controls {
+        position: absolute;
+        bottom: 10px;
+        left: 10px;
+        display: flex;
+        gap: 10px;
+        background: rgba(0, 0, 0, 0.7);
+        padding: 10px;
+        border-radius: 5px;
+    }
+    #quality-select, #speed-btn, #download-btn {
+        background: #333;
+        color: #fff;
+        border: none;
+        padding: 5px 10px;
+        border-radius: 5px;
+        cursor: pointer;
+    }
+    #quality-select {
+        width: 80px;
+    }
+</style>
+{% endblock %}
